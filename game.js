@@ -77,7 +77,23 @@ scene("game",()=>{
     ])
     //body gives gravity to the element
 
-//moving the player attaching it to keyboard events
+    const MOVE_SPEED=120
+    const JUMP_FORCE=300
+
+    //moving the player attaching it to keyboard events
+    keyDown('left',()=>{
+        player.move(-MOVE_SPEED,0)
+    })
+    //move( speed in x axis, speed in y axis)
+    keyDown('right',()=>{
+        player.move(MOVE_SPEED,0)
+    })
+    keyDown('up',()=>{
+        if(player.grounded()){
+            player.jump(JUMP_FORCE)
+        }
+        
+    })
 
     const gameLevel=addLevel(map, levelConfig);
     // we map the map that we draw with the spec of each sprite to make the level

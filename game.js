@@ -82,6 +82,16 @@ scene("game",()=>{
     const gameLevel=addLevel(map, levelConfig);
     // we map the map that we draw with the spec of each sprite to make the level
 
+
+    const scoreLabel= add([
+        text("score"),
+        pos(300,6),
+        layer("ui"),
+        {
+            value: "score"
+        }
+    ])
+    add([text("Welcome"), pos(4,6)])
 })
 start ("game")
 

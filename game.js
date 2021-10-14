@@ -31,15 +31,57 @@ scene("game",()=>{
         '                                               ',
         '                                               ',
         '                                               ',
-        '==============  ===============  ==============',
+        '                                               ',
+        '                                               ',
+        '                                               ',
+        '                                               ',
+        '                                               ',
+        '                                               ',
+        '                                               ',
+        '                                               ',
+        '                                               ',
+        '                                               ',
+        '                                               ',
+        '                                        $      ',
+        '                                     $    $    ',
+        '                                               ',
+        '                             #####             ',
+        '                                               ',
+        '       %           ##*##%##                    ',
+        '                                               ',
+        '                                            -+ ',
+        '                    ^             ^         () ',
+        '##############  ###############  ##############',
     ]
     const levelConfig={
         width:20,
         height: 20,
-        "=": [sprite('block',solid())]
+        "^": [sprite('evil-shroom'),solid()],
+        "#": [sprite('brick'),solid()],
+        "%": [sprite('surprise-block'),solid(),'coin-surprise'],
+        "*": [sprite('surprise-block'),solid(),'mushroom-surprise'],
+        "=": [sprite('block'),solid()],
+        "$": [sprite('coin'),solid()],
+        "@": [sprite('mushroom'),solid()],
+        "-": [sprite('pipe-top-left'),solid(), scale(0.5)],
+        "+": [sprite('pipe-top-right'),solid(), scale(0.5)],
+        "(": [sprite('pipe-bottom-left'),solid(), scale(0.5)],
+        ")": [sprite('pipe-bottom-right'),solid(), scale(0.5)]
     }
+    // level config is like a sprite config, it determines the widt, height and image of each sprite
+    const player = add([
+        sprite('mario'), solid(), 
+        pos(30,0),
+        body(),
+        origin('bot')
+    ])
+    //body gives gravity to the element
+
+//moving the player attaching it to keyboard events
 
     const gameLevel=addLevel(map, levelConfig);
+    // we map the map that we draw with the spec of each sprite to make the level
+
 })
 start ("game")
 

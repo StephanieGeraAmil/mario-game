@@ -13,6 +13,7 @@ const NORMAL_JUMP_FORCE=360
 const BIG_JUMP_FORCE=460
 let JUMP_FORCE =NORMAL_JUMP_FORCE
 let isJumping = true
+const FALL_DEATH = 400
 
 loadRoot('https://i.imgur.com/')
 loadSprite('coin','wbKxhcd.png')
@@ -111,8 +112,14 @@ scene("game",({  score })=>{
     ])
     //body gives gravity to the element
     action('mushroom',(mush)=>mush.move(ASSETS_SPEED,0))
-     action('dangerous',(dangerous)=>dangerous.move(-EVIL_SPEED,0))
+    action('dangerous',(dangerous)=>dangerous.move(-EVIL_SPEED,0))
 
+    player.action(() => {
+         
+            if (player.pos.y >= FALL_DEATH) {
+            go('lose', { score: scoreLabel.value})
+            }
+        })
     player.on('headbump', (obj)=>{
         if(obj.is('coin-surprise')){
             gameLevel.spawn('$', obj.gridPos.sub(0,1))

@@ -1,12 +1,16 @@
 kaboom({
 global: true,
 fullscreen: true,
-scale: 1,
+scale: 1.5,
 debug: true,
 clearColor: [ 0, 0, 0, 1]
 })
 
-
+const MOVE_SPEED=120
+const ASSETS_SPEED=40
+const NORMAL_JUMP_FORCE=360
+const BIG_JUMP_FORCE=460
+let JUMP_FORCE =NORMAL_JUMP_FORCE
 
 loadRoot('https://i.imgur.com/')
 loadSprite('coin','wbKxhcd.png')
@@ -32,13 +36,8 @@ scene("game",()=>{
         '                                               ',
         '                                               ',
         '                                               ',
-        '                                               ',
-        '                                               ',
-        '                                               ',
-        '                                               ',
-        '                                               ',
-        '                                               ',
-        '                                               ',
+
+     
         '                                               ',
         '                                               ',
         '                                               ',
@@ -61,24 +60,77 @@ scene("game",()=>{
         "%": [sprite('surprise-block'),solid(),'coin-surprise'],
         "*": [sprite('surprise-block'),solid(),'mushroom-surprise'],
         "=": [sprite('block'),solid()],
-        "$": [sprite('coin'),solid()],
-        "@": [sprite('mushroom'),solid()],
+        "$": [sprite('coin'),'coin'],
+        "@": [sprite('mushroom'),solid(),'mushroom', body()],
         "-": [sprite('pipe-top-left'),solid(), scale(0.5)],
         "+": [sprite('pipe-top-right'),solid(), scale(0.5)],
         "(": [sprite('pipe-bottom-left'),solid(), scale(0.5)],
         ")": [sprite('pipe-bottom-right'),solid(), scale(0.5)]
     }
     // level config is like a sprite config, it determines the widt, height and image of each sprite
+
+
+    function big() {
+        let timer = 0
+        let isBig = false
+        return {
+            update() {
+                if (isBig) {
+                JUMP_FORCE = BIG_JUMP_FORCE
+                timer -= dt()
+                if (timer <= 0) {
+                    this.smallify()
+                }
+                }
+            },
+            isBig() {
+                return isBig
+            },
+            smallify() {
+                this.scale = vec2(1)
+                JUMP_FORCE = NORMAL_JUMP_FORCE
+                timer = 0
+                isBig = false
+            },
+            biggify(time) {
+                this.scale = vec2(1.5)
+                timer = time
+                isBig = true     
+            }
+        }
+    }
     const player = add([
         sprite('mario'), solid(), 
         pos(30,0),
         body(),
+        big(),
         origin('bot')
     ])
     //body gives gravity to the element
+    action('mushroom',(mush)=>mush.move(ASSETS_SPEED,0))
 
-    const MOVE_SPEED=120
-    const JUMP_FORCE=300
+    player.on('headbump', (obj)=>{
+        if(obj.is('coin-surprise')){
+            gameLevel.spawn('$', obj.gridPos.sub(0,1))
+            destroy(obj)
+            gameLevel.spawn('=', obj.gridPos.sub(0,0))
+        }
+        if(obj.is('mushroom-surprise')){
+            gameLevel.spawn('@', obj.gridPos.sub(0,1))
+            destroy(obj)
+            gameLevel.spawn('=', obj.gridPos.sub(0,0))
+        }
+    })
+    player.collides('mushroom', (mushroom) => {
+        destroy(mushroom)
+        player.biggify(36)
+    })
+    player.collides('coin', (coin) => {
+        destroy(coin)
+    
+      
+    })
+ 
 
     //moving the player attaching it to keyboard events
     keyDown('left',()=>{

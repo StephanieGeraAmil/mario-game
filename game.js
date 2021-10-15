@@ -8,9 +8,11 @@ clearColor: [ 0, 0, 0, 1]
 
 const MOVE_SPEED=120
 const ASSETS_SPEED=40
+const EVIL_SPEED=15
 const NORMAL_JUMP_FORCE=360
 const BIG_JUMP_FORCE=460
 let JUMP_FORCE =NORMAL_JUMP_FORCE
+let isJumping = true
 
 loadRoot('https://i.imgur.com/')
 loadSprite('coin','wbKxhcd.png')
@@ -55,15 +57,15 @@ scene("game",({  score })=>{
     const levelConfig={
         width:20,
         height: 20,
-        "^": [sprite('evil-shroom'),solid()],
+        "^": [sprite('evil-shroom'),solid(), 'dangerous', body()],
         "#": [sprite('brick'),solid()],
         "%": [sprite('surprise-block'),solid(),'coin-surprise'],
         "*": [sprite('surprise-block'),solid(),'mushroom-surprise'],
         "=": [sprite('block'),solid()],
         "$": [sprite('coin'),'coin'],
         "@": [sprite('mushroom'),solid(),'mushroom', body()],
-        "-": [sprite('pipe-top-left'),solid(), scale(0.5)],
-        "+": [sprite('pipe-top-right'),solid(), scale(0.5)],
+        "-": [sprite('pipe-top-left'),solid(),'pipe', scale(0.5)],
+        "+": [sprite('pipe-top-right'),solid(),'pipe', scale(0.5)],
         "(": [sprite('pipe-bottom-left'),solid(), scale(0.5)],
         ")": [sprite('pipe-bottom-right'),solid(), scale(0.5)]
     }
@@ -100,7 +102,8 @@ scene("game",({  score })=>{
         }
     }
     const player = add([
-        sprite('mario'), solid(), 
+        sprite('mario'), 
+        solid(), 
         pos(30,0),
         body(),
         big(),
@@ -108,6 +111,7 @@ scene("game",({  score })=>{
     ])
     //body gives gravity to the element
     action('mushroom',(mush)=>mush.move(ASSETS_SPEED,0))
+     action('dangerous',(dangerous)=>dangerous.move(-EVIL_SPEED,0))
 
     player.on('headbump', (obj)=>{
         if(obj.is('coin-surprise')){
@@ -121,6 +125,8 @@ scene("game",({  score })=>{
             gameLevel.spawn('=', obj.gridPos.sub(0,0))
         }
     })
+
+ 
     player.collides('mushroom', (mushroom) => {
         destroy(mushroom)
         player.biggify(36)
@@ -131,6 +137,20 @@ scene("game",({  score })=>{
         scoreLabel.text = scoreLabel.value
       
     })
+    player.collides('dangerous',(dangerous)=>{
+        if(isJumping){
+            destroy(dangerous)
+        }else{
+        go('lose', { score: scoreLabel.value})
+        }
+    })
+
+  player.collides('pipe', () => {
+    keyPress('down', () => {
+         go('win', { score: scoreLabel.value})
+    
+    })
+  })
  
 
     //moving the player attaching it to keyboard events
@@ -141,9 +161,15 @@ scene("game",({  score })=>{
     keyDown('right',()=>{
         player.move(MOVE_SPEED,0)
     })
+    player.action(() => {
+        if(player.grounded()) {
+        isJumping = false
+        }
+     })
     keyDown('up',()=>{
         if(player.grounded()){
             player.jump(JUMP_FORCE)
+            isJumping=true
         }
         
     })
@@ -161,6 +187,14 @@ scene("game",({  score })=>{
         }
     ])
     add([text("Welcome"), pos(4,6)])
+})
+
+scene('lose', ({ score }) => {
+  add([text(`Total score: ${score}`, 32), origin('center'), pos(width()/2, height()/ 2)])
+})
+scene('win', ({ score }) => {
+     add([text(`Congratulations!!`, 32), origin('center'), pos(width()/2, (height()/ 2)-50)])
+  add([text(`Total score: ${score}`, 32), origin('center'), pos(width()/2, height()/ 2)])
 })
 start ("game",{  score: 0})
 

@@ -26,7 +26,7 @@ loadSprite('pipe-bottom-left','c1cYSbt.png')
 loadSprite('pipe-bottom-right','nqQ79eI.png')
 
 
-scene("game",()=>{
+scene("game",({  score })=>{
     layers(["bg","obj","ui"],'obj')
     const map=[
         '                                               ',
@@ -127,7 +127,8 @@ scene("game",()=>{
     })
     player.collides('coin', (coin) => {
         destroy(coin)
-    
+        scoreLabel.value++
+        scoreLabel.text = scoreLabel.value
       
     })
  
@@ -152,14 +153,14 @@ scene("game",()=>{
 
 
     const scoreLabel= add([
-        text("score"),
+        text(score),
         pos(300,6),
         layer("ui"),
         {
-            value: "score"
+            value: score
         }
     ])
     add([text("Welcome"), pos(4,6)])
 })
-start ("game")
+start ("game",{  score: 0})
 
